@@ -1,6 +1,6 @@
-#ReactiveCocoa
+# ReactiveCocoa
 
-##如何运作
+## 如何运作
 ```
 [[RACSignal createSignal:^RACDisposable *(id<RACSubscriber> subscriber) {
         [subscriber sendNext:@"hello maybe"];
@@ -11,7 +11,7 @@
     }];
 ```
 从上述代码中，RAC到底是如何运作的呢?
-##createSignal:
+## createSignal:
 这个步骤会生成一个信号量，一般情况下会生成DynamicSignal，并且将subscriber(订阅者)的实现代码已block的形式保存下来。
 
 `在这个阶段，只是单纯的存储了一个block而已`
@@ -24,7 +24,7 @@
 	return [signal setNameWithFormat:@"+createSignal:"];
 }
 ```
-##subscribeNext:
+## subscribeNext:
 这一步骤里，生成了一个实现了RACSubscriber协议的类`RACSubscriber`，*不用奇怪，协议和类的名字是一样的*。这个就是订阅者，不过我们平时是不会用到的，这是RAC内部使用的类。
 
 然后将我们真正需要执行的代码已block的形势保存下来。
@@ -40,7 +40,7 @@
 ```
 
 这个函数最终返回的是RACDiposable，该类主要是控制订阅者是否取消接下来的工作。使用[RACDisposable dispose]即可取消掉。
-##subscribe:
+## subscribe:
 这个方法是RACSignal(基类)的方法，然后本身不实现，交给派生类实现该方法。本例子是RACDynamicSignal的使用。
 
 ```
@@ -67,10 +67,10 @@
 
 在最后会去使用RACScheduler进行处理`self.didSubscribe(subscriber)`
 
-##RACDisposable
-##RACScheduler
+## RACDisposable
+## RACScheduler
 
-##bind:
+## bind:
 
 ```
 typedef RACStream * (^RACStreamBindBlock)(id value, BOOL *stop);
@@ -83,7 +83,7 @@ typedef RACStream * (^RACStreamBindBlock)(id value, BOOL *stop);
 返回类型其实是RACDynamicSignal
 
 flattenMap:正是实用bind来巧妙的转换signal
-###实现方案
+### 实现方案
 
 1. 创建一个控制信号的dispoable来管理生命周期
 2. 实现2个block，一个completeSignal，一个addSignal。
@@ -92,7 +92,7 @@ flattenMap:正是实用bind来巧妙的转换signal
 5. 完成上述准备之后，开始真正进行订阅状态的处理，处理自己的next、error、complete情形下的逻辑。在next中使用block获取到接下来要转换的signal，使用addSignal进行处理；error和complete则直接使用初始时的disposable，并且使用completeSignal结束周期
 
 
-#Tip
+# Tip
 - RAC_signalForSelector:并不适合使用有返回值的SEL
 - RAC_signalForSelector:只会返回sendNext:，所以不能使用then等
 - - 调用该方法的时候，会使用runtime替换掉消息转发的一系列的方法实现，然后返回Signal
@@ -118,5 +118,5 @@ flattenMap:正是实用bind来巧妙的转换signal
 - stack中拥有一个id<ViewModelServices>，下面我们就可以使用RAC来监听push，pop等方法了
 - 最后，创建一个Router来管理ViewModel相对应的ViewController
 
-##[GitBucket iOS](https://github.com/leichunfeng/MVVMReactiveCocoa)
+## [GitBucket iOS](https://github.com/leichunfeng/MVVMReactiveCocoa)
 在app代码中重点看`MRCNavigationControllerStack`,`MRCViewModelServices`,`MRCViewModelServicesImpl`,`MRCNavigationProtocol`,`MRCRouter`
